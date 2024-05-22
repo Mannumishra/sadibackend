@@ -9,7 +9,7 @@ const successSchema = new mongoose.Schema({
         type:String,
         required:[true,"Name is must Required"]
     },
-    successstory:{
+    successmess:{
         type:String,
         required:[true,"Success Story  is must Required"]
     },

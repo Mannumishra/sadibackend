@@ -18,15 +18,15 @@ const uploadimage = async (file) => {
 }
 const createRecord = async (req, res) => {
     try {
-        const { husbandname, wifename, successstory } = req.body
-        if (!husbandname || !wifename || !successstory) {
+        const { husbandname, wifename, successmess } = req.body
+        if (!husbandname || !wifename || !successmess) {
             return res.status(403).json({
                 success: false,
                 mess: "Fill are fields"
             })
         }
         else {
-            const data = new successstory({ husbandname, wifename, successstory })
+            const data = new successstory ({ husbandname, wifename, successmess })
             if (req.file) {
                 const imageurl = await uploadimage(req.file.path)
                 data.image = imageurl
@@ -39,6 +39,7 @@ const createRecord = async (req, res) => {
             })
         }
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             mess: "Internal Server error"
