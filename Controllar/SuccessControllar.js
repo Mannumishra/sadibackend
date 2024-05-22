@@ -63,7 +63,76 @@ const getRecord = async (req, res) => {
     }
 }
 
+const getSingleRecord = async (req, res) => {
+    try {
+        let data = await successstory.findOne({ _id: req.params._id })
+        res.status(200).json({
+            success: true,
+            mess: "Record Found",
+            data: data
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            mess: "Internal Server Error"
+        })
+    }
+}
+
+const updateRecord = async (req, res) => {
+    try {
+        let data = await successstory.findOne({ _id: req.params._id })
+        if (data) {
+            data.husbandname = req.body.name ?? data.husbandname
+            data.wifename = req.body.name ?? data.wifename
+            data.successmess = req.body.name ?? data.successmess
+            if (req.file) {
+                try {
+                    fs.unlinkSync(data.image)
+                } catch (error) { }
+                const image_url = await uploadimage(req.file.path)
+                data.image = image_url
+            }
+            await data.save()
+            res.status(200).json({
+                success: true,
+                mess: "Record Updated Successfully",
+                data: data
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            mess: "Internal Server Error"
+        })
+    }
+}
+
+const deleteRecord = async (req, res) => {
+    try {
+        let data = await successstory.findOne({ _id: req.params._id })
+        if (data) {
+            await data.deleteOne()
+            res.status(200).json({
+                success: true,
+                mess: "Record Deleted Successfully",
+                data: data
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            mess: "Internal Server Error"
+        })
+    }
+}
+
 module.exports = {
     createRecord: createRecord,
-    getRecord:getRecord
+    getRecord: getRecord,
+    getSingleRecord: getSingleRecord,
+    deleteRecord: deleteRecord,
+    updateRecord:updateRecord
 }
