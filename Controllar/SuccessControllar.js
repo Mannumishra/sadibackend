@@ -83,9 +83,9 @@ const updateRecord = async (req, res) => {
     try {
         let data = await successstory.findOne({ _id: req.params._id })
         if (data) {
-            data.husbandname = req.body.name ?? data.husbandname
-            data.wifename = req.body.name ?? data.wifename
-            data.successmess = req.body.name ?? data.successmess
+            data.husbandname = req.body.husbandname ?? data.husbandname
+            data.wifename = req.body.wifename ?? data.wifename
+            data.successmess = req.body.successmess ?? data.successmess
             if (req.file) {
                 try {
                     fs.unlinkSync(data.image)
@@ -134,5 +134,5 @@ module.exports = {
     getRecord: getRecord,
     getSingleRecord: getSingleRecord,
     deleteRecord: deleteRecord,
-    updateRecord:updateRecord
+    updateRecord: updateRecord
 }
