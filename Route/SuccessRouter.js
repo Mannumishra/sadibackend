@@ -18,6 +18,6 @@ successRouter.post("/success", upload.single("image"), createRecord)
 successRouter.get("/success", getRecord)
 successRouter.get("/success/:_id", getSingleRecord)
 successRouter.delete("/success/:_id", deleteRecord)
-successRouter.put("/success/:_id", updateRecord)
+successRouter.put("/success/:_id", upload.single("image"), updateRecord)
 
 module.exports = successRouter
