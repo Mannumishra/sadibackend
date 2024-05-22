@@ -8,7 +8,7 @@ const cloudinary = require("cloudinary").v2
 
 cloudinary.config({
     cloud_name: "dsimn9z1r",
-    api_key: "998919427255124",
+    api_key: "998919427255124", 
     api_secret: "h-PsVovtSvzakWubj1X8sXJEtp4"
 })
 

@@ -41,5 +41,5 @@ const getRecord = async (req, res) => {
 }
 module.exports = {
     createContat: createContat,
-    getRecord:getRecord
+    getRecord: getRecord
 }
