@@ -1,4 +1,4 @@
-const { createRecord } = require("../Controllar/SuccessControllar")
+const { createRecord, getRecord } = require("../Controllar/SuccessControllar")
 const multer = require("multer")
 
 const storage = multer.diskStorage({
@@ -15,5 +15,6 @@ const upload = multer({ storage: storage })
 const successRouter = require("express").Router()
 
 successRouter.post("/success", upload.single("image"), createRecord)
+successRouter.get("/success", getRecord)
 
 module.exports = successRouter

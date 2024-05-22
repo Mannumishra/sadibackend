@@ -26,7 +26,7 @@ const createRecord = async (req, res) => {
             })
         }
         else {
-            const data = new successstory ({ husbandname, wifename, successmess })
+            const data = new successstory({ husbandname, wifename, successmess })
             if (req.file) {
                 const imageurl = await uploadimage(req.file.path)
                 data.image = imageurl
@@ -47,6 +47,23 @@ const createRecord = async (req, res) => {
     }
 }
 
+const getRecord = async (req, res) => {
+    try {
+        let data = await successstory.find()
+        res.status(200).json({
+            success: true,
+            mess: "Record Found",
+            data: data
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            mess: "Internal Server Error"
+        })
+    }
+}
+
 module.exports = {
-    createRecord: createRecord
+    createRecord: createRecord,
+    getRecord:getRecord
 }
