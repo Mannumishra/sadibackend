@@ -170,6 +170,28 @@ const updateRecord = async (req, res) => {
     }
 }
 
+const deleteRecord = async (req, res) => {
+    try {
+        let data = await user.findOne({ _id: req.params._id })
+        if(data){
+            try {
+                fs.unlinkSync(data.image)
+            } catch (error) {}
+            await data.deleteOne()
+            res.status(200).json({
+                success: true,
+                mess: "User Record Deleted",
+                data: data
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            mess: "Internal Server Error"
+        })
+    }
+}
+
 const login = async (req, res) => {
     try {
         // console.log(req.body)
@@ -213,5 +235,6 @@ module.exports = {
     getRecord: getRecord,
     getSingleRecord: getSingleRecord,
     updateRecord: updateRecord,
-    login: login
+    login: login,
+    deleteRecord:deleteRecord
 }

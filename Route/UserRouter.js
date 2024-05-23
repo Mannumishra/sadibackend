@@ -1,4 +1,4 @@
-const { createRecord, getRecord, getSingleRecord, login, updateRecord } = require("../Controllar/UserControllar")
+const { createRecord, getRecord, getSingleRecord, login, updateRecord, deleteRecord } = require("../Controllar/UserControllar")
 const multer = require("multer")
 
 const storage = multer.diskStorage({
@@ -19,5 +19,6 @@ userRouter.get("/user", getRecord)
 userRouter.get("/user/:_id", getSingleRecord)
 userRouter.put("/user/:_id", upload.single("image"), updateRecord)
 userRouter.post("/user/login", login)
+userRouter.delete("/user/:_id", deleteRecord)
 
 module.exports = userRouter
