@@ -160,9 +160,6 @@ const deleteRecord = async (req, res) => {
     try {
         let data = await user.findOne({ _id: req.params._id })
         if (data) {
-            try {
-                fs.unlinkSync(data.image)
-            } catch (error) { }
             await data.deleteOne()
             res.status(200).json({
                 success: true,
