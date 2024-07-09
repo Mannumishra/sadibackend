@@ -3,23 +3,7 @@ const passwordvalidator = require("password-validator")
 const bcrypt = require("bcrypt")
 const fs = require("fs")
 const jwt = require("jsonwebtoken")
-// const { error } = require("console")
-const cloudinary = require("cloudinary").v2
-
-cloudinary.config({
-    cloud_name: "dsimn9z1r",
-    api_key: "998919427255124", 
-    api_secret: "h-PsVovtSvzakWubj1X8sXJEtp4"
-})
-
-const uploadCloundanary = async (file) => {
-    try {
-        const uploadfile = await cloudinary.uploader.upload(file)
-        return uploadfile.secure_url
-    } catch (error) {
-        console.log(error)
-    }
-}
+const { uploadCloundanary } = require("../Utils/cloundanry")
 
 const schema = new passwordvalidator()
 schema
@@ -34,7 +18,6 @@ schema
 
 const createRecord = async (req, res) => {
     try {
-        // console.log(req.body)
         const { name, fathername, mothername, age, gender, dateofbirth, birthplace, height, siblings, religion, cast, subcast, gotra, ggotra, mgotra, education, address, pin, city, state, email, phone, password, salary, companyname } = req.body
         if (!name || !fathername || !mothername || !age || !gender || !dateofbirth || !birthplace || !height || !siblings || !religion || !cast || !subcast || !gotra || !mgotra || !ggotra || !education || !address || !pin || !city || !state || !email || !phone || !password) {
             return res.status(403).json({
@@ -58,6 +41,9 @@ const createRecord = async (req, res) => {
                         data.image = imageurl
                     }
                     await data.save()
+                    try {
+                        fs.unlinkSync(req.file.path)
+                    } catch (error) { }
                     res.status(200).json({
                         success: true,
                         mess: "User Signup Successfully Complete",
@@ -173,10 +159,10 @@ const updateRecord = async (req, res) => {
 const deleteRecord = async (req, res) => {
     try {
         let data = await user.findOne({ _id: req.params._id })
-        if(data){
+        if (data) {
             try {
                 fs.unlinkSync(data.image)
-            } catch (error) {}
+            } catch (error) { }
             await data.deleteOne()
             res.status(200).json({
                 success: true,
@@ -236,5 +222,5 @@ module.exports = {
     getSingleRecord: getSingleRecord,
     updateRecord: updateRecord,
     login: login,
-    deleteRecord:deleteRecord
+    deleteRecord: deleteRecord
 }

@@ -1,16 +1,6 @@
 const { createRecord, getRecord, getSingleRecord, login, updateRecord, deleteRecord } = require("../Controllar/UserControllar")
-const multer = require("multer")
+const upload = require("../Middleware/middleware")
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./Public/User")
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + file.originalname)
-    }
-})
-
-const upload = multer({ storage: storage })
 
 const userRouter = require("express").Router()
 
