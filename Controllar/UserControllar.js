@@ -135,13 +135,13 @@ const updateRecord = async (req, res) => {
             data.email = req.body.email ?? data.email
             data.phone = req.body.phone ?? data.phone
             if (req.file) {
-                try {
-                    fs.unlinkSync(data.image)
-                } catch (error) { }
                 const imageurl = await uploadCloundanary(req.file.path)
                 data.image = imageurl
             }
             await data.save()
+            try {
+                fs.unlinkSync(req.file.path)
+            } catch (error) { }
             res.status(200).json({
                 success: true,
                 mess: "Record Updated Successfully",

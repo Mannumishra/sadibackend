@@ -1,21 +1,7 @@
 const successstory = require("../Model/SuccessStorySchema")
-const cloudinary = require("cloudinary").v2
 const fs = require("fs")
+const { uploadCloundanary } = require("../Utils/cloundanry")
 
-cloudinary.config({
-    cloud_name: "dsimn9z1r",
-    api_key: "998919427255124",
-    api_secret: "h-PsVovtSvzakWubj1X8sXJEtp4"
-})
-
-const uploadimage = async (file) => {
-    try {
-        const uplodefile = await cloudinary.uploader.upload(file)
-        return uplodefile.secure_url
-    } catch (error) {
-        console.log(error)
-    }
-}
 const createRecord = async (req, res) => {
     try {
         const { husbandname, wifename, successmess } = req.body
@@ -28,10 +14,13 @@ const createRecord = async (req, res) => {
         else {
             const data = new successstory({ husbandname, wifename, successmess })
             if (req.file) {
-                const imageurl = await uploadimage(req.file.path)
+                const imageurl = await uploadCloundanary(req.file.path)
                 data.image = imageurl
             }
             await data.save()
+            try {
+                fs.unlinkSync(req.file.path)
+            } catch (error) {}
             res.status(200).json({
                 success: true,
                 mess: "Success Story Created",
@@ -87,13 +76,13 @@ const updateRecord = async (req, res) => {
             data.wifename = req.body.wifename ?? data.wifename
             data.successmess = req.body.successmess ?? data.successmess
             if (req.file) {
-                try {
-                    fs.unlinkSync(data.image)
-                } catch (error) { }
-                const image_url = await uploadimage(req.file.path)
+                const image_url = await uploadCloundanary(req.file.path)
                 data.image = image_url
             }
             await data.save()
+            try {
+                fs.unlinkSync(req.file.path)
+            } catch (error) {}
             res.status(200).json({
                 success: true,
                 mess: "Record Updated Successfully",
