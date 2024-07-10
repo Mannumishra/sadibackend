@@ -6,6 +6,7 @@ const cors = require("cors")
 const userRouter = require("./Route/UserRouter")
 const contactRouter = require("./Route/ContactRouter")
 const successRouter = require("./Route/SuccessRouter")
+const bannerRouter = require("./Route/Bannerrouter")
 const app = express()
 
 app.use(cors())
@@ -15,6 +16,7 @@ app.set(express.static("./Public"))
 app.use("/api", userRouter)
 app.use("/api", contactRouter)
 app.use("/api", successRouter)
+app.use("/api", bannerRouter)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running at ${process.env.PORT}`)
