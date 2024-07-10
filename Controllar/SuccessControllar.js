@@ -4,15 +4,15 @@ const { uploadCloundanary } = require("../Utils/cloundanry")
 
 const createRecord = async (req, res) => {
     try {
-        const { husbandname, wifename, successmess } = req.body
-        if (!husbandname || !wifename || !successmess) {
+        const { description,  subdescription ,date } = req.body
+        if (!description ||  !subdescription || !date) {
             return res.status(403).json({
                 success: false,
                 mess: "Fill are fields"
             })
         }
         else {
-            const data = new successstory({ husbandname, wifename, successmess })
+            const data = new successstory({ description, subdescription ,date })
             if (req.file) {
                 const imageurl = await uploadCloundanary(req.file.path)
                 data.image = imageurl
@@ -72,9 +72,9 @@ const updateRecord = async (req, res) => {
     try {
         let data = await successstory.findOne({ _id: req.params._id })
         if (data) {
-            data.husbandname = req.body.husbandname ?? data.husbandname
-            data.wifename = req.body.wifename ?? data.wifename
-            data.successmess = req.body.successmess ?? data.successmess
+            data.description = req.body.description ?? data.description
+            data.subdescription = req.body.subdescription ?? data.subdescription
+            data.date = req.body.date ?? data.date
             if (req.file) {
                 const image_url = await uploadCloundanary(req.file.path)
                 data.image = image_url

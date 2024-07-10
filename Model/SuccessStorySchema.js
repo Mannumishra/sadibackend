@@ -1,17 +1,17 @@
 const mongoose = require("mongoose")
 
 const successSchema = new mongoose.Schema({
-    husbandname:{
+    description:{
         type:String,
-        required:[true,"Name is must Required"]
+        required:[true,"description is must Required"]
     },
-    wifename:{
+    subdescription:{
         type:String,
-        required:[true,"Name is must Required"]
+        required:[true,"subdescription is must Required"]
     },
-    successmess:{
+    date:{
         type:String,
-        required:[true,"Success Story  is must Required"]
+        required:[true,"date is must Required"]
     },
     image:{
         type:String,

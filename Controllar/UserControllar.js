@@ -18,6 +18,8 @@ schema
 
 const createRecord = async (req, res) => {
     try {
+        console.log(req.body)
+        console.log("i am hit ")
         const { name, fathername, mothername, age, gender, dateofbirth, birthplace, height, siblings, religion, cast, subcast, gotra, ggotra, mgotra, education, address, pin, city, state, email, phone, password, salary, companyname } = req.body
         if (!name || !fathername || !mothername || !age || !gender || !dateofbirth || !birthplace || !height || !siblings || !religion || !cast || !subcast || !gotra || !mgotra || !ggotra || !education || !address || !pin || !city || !state || !email || !phone || !password) {
             return res.status(403).json({
@@ -60,8 +62,9 @@ const createRecord = async (req, res) => {
         }
 
     } catch (error) {
+        console.log(error)
         if (error.keyValue.email) {
-            return res.status(403).json({
+             res.status(403).json({
                 success: false,
                 mess: "Email Is is Already Register"
             })
@@ -88,6 +91,7 @@ const getRecord = async (req, res) => {
         })
     }
 }
+
 
 const getSingleRecord = async (req, res) => {
     try {
@@ -177,7 +181,7 @@ const deleteRecord = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        // console.log(req.body)
+        console.log(req.body)
         let data = await user.findOne({
             $or: [
                 { email: req.body.email },
