@@ -19,21 +19,32 @@ schema
 const createRecord = async (req, res) => {
     try {
         console.log(req.body)
-        console.log("i am hit ")
         const { name, fathername, mothername, age, gender, dateofbirth, birthplace, height, siblings, religion, cast, subcast, gotra, ggotra, mgotra, education, address, pin, city, state, email, phone, password, salary, companyname } = req.body
         if (!name || !fathername || !mothername || !age || !gender || !dateofbirth || !birthplace || !height || !siblings || !religion || !cast || !subcast || !gotra || !mgotra || !ggotra || !education || !address || !pin || !city || !state || !email || !phone || !password) {
             return res.status(403).json({
                 success: false,
-                mess: "Please fill are Required Fields"
+                message: "Please fill are Required Fields"
             })
         }
         if (req.body.password && schema.validate(req.body.password)) {
+            const existingUser = await user.findOne({
+                $or: [
+                    { email: email },
+                    { phone: phone }
+                ]
+            });
+            if (existingUser) {
+                return res.status(403).json({
+                    success: false,
+                    message: existingUser.email === email ? "Email is already registered" : "Phone number is already registered"
+                });
+            }
             let data = new user({ name, fathername, mothername, gender, dateofbirth, birthplace, age, height, siblings, religion, cast, subcast, gotra, mgotra, ggotra, education, address, pin, city, state, email, phone, password, companyname, salary })
             bcrypt.hash(data.password, 12, async (error, hash) => {
                 if (error) {
                     return res.status(500).json({
                         success: false,
-                        mess: "Internal Server Error"
+                        message: "Internal Server Error"
                     })
                 }
                 else {
@@ -48,7 +59,7 @@ const createRecord = async (req, res) => {
                     } catch (error) { }
                     res.status(200).json({
                         success: true,
-                        mess: "User Signup Successfully Complete",
+                        message: "User Signup Successfully Complete",
                         data: data
                     })
                 }
@@ -57,7 +68,7 @@ const createRecord = async (req, res) => {
         else {
             return res.status(403).json({
                 success: false,
-                mess: "Password is must be strong"
+                message: "Your password must be at least 6 characters, include an uppercase letter, a number, and a special symbol."
             })
         }
 
@@ -66,12 +77,12 @@ const createRecord = async (req, res) => {
         if (error.keyValue.email) {
              res.status(403).json({
                 success: false,
-                mess: "Email Is is Already Register"
+                message: "Email Is is Already Register"
             })
         }
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -81,13 +92,13 @@ const getRecord = async (req, res) => {
         let data = await user.find()
         res.status(200).json({
             success: true,
-            mess: "User Record Found",
+            message: "User Record Found",
             data: data
         })
     } catch (error) {
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -98,13 +109,13 @@ const getSingleRecord = async (req, res) => {
         let data = await user.findOne({ _id: req.params._id })
         res.status(200).json({
             success: true,
-            mess: "User Record Found",
+            message: "User Record Found",
             data: data
         })
     } catch (error) {
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -148,14 +159,14 @@ const updateRecord = async (req, res) => {
             } catch (error) { }
             res.status(200).json({
                 success: true,
-                mess: "Record Updated Successfully",
+                message: "Record Updated Successfully",
                 data: data
             })
         }
     } catch (error) {
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -167,14 +178,14 @@ const deleteRecord = async (req, res) => {
             await data.deleteOne()
             res.status(200).json({
                 success: true,
-                mess: "User Record Deleted",
+                message: "User Record Deleted",
                 data: data
             })
         }
     } catch (error) {
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
@@ -194,7 +205,7 @@ const login = async (req, res) => {
                 let key = process.env.SALT_KEY
                 jwt.sign({ data }, key, { expiresIn: 1296000 }, (error, token) => {
                     if (error) {
-                        res.status(500).json({ success: false, message: "Internal Server Error" })
+                        res.status(500).json({ success: false, messageage: "Internal Server Error" })
                     }
                     else {
                         res.status(200).json({ success: true, data: data, token: token })
@@ -205,14 +216,14 @@ const login = async (req, res) => {
         else {
             return res.status(403).json({
                 success: false,
-                mess: "Invaild Email id"
+                message: "Invaild Email id"
             })
         }
     } catch (error) {
         console.log(error)
         res.status(500).json({
             success: false,
-            mess: "Internal Server Error"
+            message: "Internal Server Error"
         })
     }
 }
