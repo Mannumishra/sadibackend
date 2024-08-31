@@ -313,51 +313,75 @@ const forgetpassword2 = async (req, res) => {
 
 const forgetpassword3 = async (req, res) => {
     try {
-        const data = await user.findOne({ email: req.body.email })
+        const data = await user.findOne({ email: req.body.email });
         if (!data) {
             return res.status(404).json({
                 success: false,
-                message: "USerNot Found"
-            })
-        }
-        else {
+                message: "User Not Found"
+            });
+        } else {
             if (!req.body.password) {
                 return res.status(404).json({
                     success: false,
-                    message: "Password must required"
-                })
-            }
-            else if (!schema.validate(req.body.password)) {
-                return res.status(404).json({
+                    message: "Password is required"
+                });
+            } else if (!schema.validate(req.body.password)) {
+                return res.status(400).json({
                     success: false,
                     message: "Your password must be at least 6 characters, include an uppercase letter, a number, and a special symbol."
-                })
-            }
-            else {
+                });
+            } else {
                 bcrypt.hash(req.body.password, 12, async (error, hash) => {
                     if (error) {
                         return res.status(500).json({
                             success: false,
                             message: "Internal Server Error"
-                        })
+                        });
                     }
-                    data.password = hash
-                    await data.save()
+                    data.password = hash;
+                    await data.save();
+
+                    // Send confirmation email after successful password reset
+                    const mailOptions = {
+                        from: process.env.MAIL_SENDER,
+                        to: data.email,
+                        subject: "Your Password Has Been Reset Successfully - Sitaram Marriage Bureau",
+                        html: `
+                            <html>
+                            <body style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0;">
+                                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-sizing: border-box;">
+                                    <img src="https://sitarammarriagebureau.com/static/media/image.5d600b10130a8f519a91.png" alt="Sitaram Marriage Bureau Logo" style="display: block; margin: 0 auto; width: 200px;"/>
+                                    <h2 style="color: #0056b3; font-size: 24px; margin: 20px 0 10px;">Hello ${data.name},</h2>
+                                    <p style="font-size: 16px; margin: 0 0 10px;">Your password has been successfully reset. You can now log in with your new password.</p>
+                                    <p style="font-size: 14px; color: #555; margin: 0 0 20px;">If you did not request this change, please contact our support team immediately.</p>
+                                    <p style="margin: 0 0 10px;">Thank you,<br>
+                                    <strong>Sitaram Marriage Bureau</strong></p>
+                                    <p style="font-size: 12px; color: #aaa; margin: 0;">If you have any questions or need further assistance, please contact our support team.</p>
+                                </div>
+                            </body>
+                            </html>
+                        `
+                    };
+
+                    // Sending email logic (using your preferred email service)
+                    await transporter.sendMail(mailOptions);
+
                     res.status(200).json({
                         success: true,
-                        message: "Password Reset successfully"
-                    })
-                })
+                        message: "Password Reset successfully, email sent."
+                    });
+                });
             }
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error"
-        })
+        });
     }
-}
+};
+
 module.exports = {
     createRecord, createRecord,
     getRecord: getRecord,
