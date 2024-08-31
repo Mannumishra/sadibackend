@@ -202,7 +202,13 @@ const login = async (req, res) => {
         })
         if (data) {
             const isPasswordValid = await bcrypt.compare(req.body.password, data.password)
-            if (isPasswordValid) {
+            if (!isPasswordValid) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Invaild Password"
+                })
+            }
+            else {
                 let key = process.env.SALT_KEY
                 jwt.sign({ data }, key, { expiresIn: 1296000 }, (error, token) => {
                     if (error) {
