@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt")
 const fs = require("fs")
 const jwt = require("jsonwebtoken")
 const { uploadCloundanary } = require("../Utils/cloundanry")
+const { transporter } = require("../Utils/nodemailer")
 
 const schema = new passwordvalidator()
 schema
@@ -75,7 +76,7 @@ const createRecord = async (req, res) => {
     } catch (error) {
         console.log(error)
         if (error.keyValue.email) {
-             res.status(403).json({
+            res.status(403).json({
                 success: false,
                 message: "Email Is is Already Register"
             })
@@ -228,11 +229,137 @@ const login = async (req, res) => {
     }
 }
 
+const forgetpassword1 = async (req, res) => {
+    try {
+        const data = await user.findOne({ email: req.body.email })
+        if (data) {
+            let otp = parseInt(Math.random() * 1000000)
+            data.otp = otp
+            await data.save()
+            const mailOptions = {
+                from: process.env.MAIL_SENDER,
+                to: data.email,
+                subject: "Password Reset OTP - Sitaram Marriage Bureau",
+                html: `
+                    <html>
+                    <body style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0;">
+                        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-sizing: border-box;">
+                            <img src="https://sitarammarriagebureau.com/static/media/image.5d600b10130a8f519a91.png" alt="Sitaram Marriage Bureau Logo" style="display: block; margin: 0 auto; width: 200px;"/>
+                            <h2 style="color: #0056b3; font-size: 24px; margin: 0 0 10px;">Hello ${data.name},</h2>
+                            <p style="font-size: 16px; margin: 0 0 10px;">We received a request to reset your password. To complete the process, please use the OTP below:</p>
+                            <h3 style="font-size: 24px; color: #e74c3c; margin: 0 0 10px;">${data.otp}</h3>
+                            <p style="font-size: 14px; color: #555; margin: 0 0 20px;">For security reasons, please do not share this OTP with anyone. If you did not request a password reset, you can safely ignore this email.</p>
+                            <p style="margin: 0 0 10px;">Thank you,<br>
+                            <strong>Sitaram Marriage Bureau</strong></p>
+                            <p style="font-size: 12px; color: #aaa; margin: 0;">If you have any questions or need further assistance, please contact our support team.</p>
+                        </div>
+                    </body>
+                    </html>
+                `
+            };
+            transporter.sendMail(mailOptions, ((error) => {
+                if (error) {
+                    return res.status(400).json({ success: false, message: "Invalid Email Address" })
+                }
+                res.status(200).json({ success: true, message: "OTP Sent on Your Registered Email Address" })
+            }))
+        }
+        else {
+            return res.status(404).json({ success: false, message: "Invalid Email Address" })
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: "Internal Server Error" })
+    }
+}
+
+const forgetpassword2 = async (req, res) => {
+    try {
+        const data = await user.findOne({ email: req.body.email })
+        if (!data) {
+            return res.status(404).json({
+                success: false,
+                message: "User Not found"
+            })
+        }
+        else {
+            if (data.otp == req.body.otp) {
+                res.status(200).json({
+                    success: true,
+                    message: "Otp Verify successfully"
+                })
+            }
+            else {
+                return res.status(404).json({
+                    success: false,
+                    message: "Invalid Otp "
+                })
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Errror"
+        })
+    }
+}
+
+const forgetpassword3 = async (req, res) => {
+    try {
+        const data = await user.findOne({ email: req.body.email })
+        if (!data) {
+            return res.status(404).json({
+                success: false,
+                message: "USerNot Found"
+            })
+        }
+        else {
+            if (!req.body.password) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Password must required"
+                })
+            }
+            else if (!schema.validate(req.body.password)) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Your password must be at least 6 characters, include an uppercase letter, a number, and a special symbol."
+                })
+            }
+            else {
+                bcrypt.hash(req.body.password, 12, async (error, hash) => {
+                    if (error) {
+                        return res.status(500).json({
+                            success: false,
+                            message: "Internal Server Error"
+                        })
+                    }
+                    data.password = hash
+                    await data.save()
+                    res.status(200).json({
+                        success: true,
+                        message: "Password Reset successfully"
+                    })
+                })
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
 module.exports = {
     createRecord, createRecord,
     getRecord: getRecord,
     getSingleRecord: getSingleRecord,
     updateRecord: updateRecord,
     login: login,
-    deleteRecord: deleteRecord
+    deleteRecord: deleteRecord,
+    forgetpassword1: forgetpassword1,
+    forgetpassword2: forgetpassword2,
+    forgetpassword3: forgetpassword3
 }

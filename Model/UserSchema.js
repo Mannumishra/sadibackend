@@ -105,6 +105,9 @@ const userschema = new mongoose.Schema({
         type: String,
         required: [true, "image Is Must Required"]
     },
+    otp: {
+        type: Number,
+    }
 })
 
 const user = mongoose.model("user", userschema)
